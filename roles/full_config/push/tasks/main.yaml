@@ -1,0 +1,14 @@
+---
+- name: Pushing Full configuration to a Cisco Device {{ inventory_hostname }}
+  cisco.ios.ios_config:
+    src: "configs/{{ inventory_hostname }}.conf"
+    replace: line
+    save_when: modified
+  when: "ansible_network_os == 'ios'"
+
+- name: Pushing Full configuration to a Arista Device {{ inventory_hostname }}
+  arista.eos.eos_config:
+    src: "configs/{{ inventory_hostname }}.conf"
+    replace: line
+    save_when: modified
+  when: "ansible_network_os == 'eos'"

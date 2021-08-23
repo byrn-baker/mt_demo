@@ -1,0 +1,47 @@
+system {
+    host-name {{ devices[0]["name"] }};
+    management-instance;;
+    root-authentication {
+        encrypted-password "$6$9Lt8Eru3$fjcxjCqq.rq0lqV35VDb4f86a07uWeqK1r0Axt0e8talYeMRFqLlm4rTEa4rx/bS1qgjUaOXovgUL5I0EliJl/";
+    }
+    login {
+        user automate {
+            uid 2000;
+            class super-user;
+            authentication {
+                encrypted-password "$6$iW5a5wge$Ybp80TVa2dAvMGne9SRr6.8jIr2kGGJ/Wk5p.S.J1sFXkw58l0g4kG4NaWqQbpqjwMurroIbpXXJsPmwRIJeU.";
+            }
+        }
+    }
+    services {
+        ssh {
+            root-login allow;
+        }
+        netconf {
+            ssh;
+        }
+        rest {
+            http {
+                port 8080;
+            }
+            enable-explorer;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+        file default-log-messages {
+            any info;
+            match "(requested 'commit' operation)|(requested 'commit synchronize' operation)|(copying configuration to juniper.save)|(commit complete)|ifAdminStatus|(FRU power)|(FRU removal)|(FRU insertion)|(link UP)|transitioned|Transferred|transfer-file|(license add)|(license delete)|(package -X update)|(package -X delete)|(FRU Online)|(FRU Offline)|(plugged in)|(unplugged)|GRES";
+            structured-data;
+        }
+    }
+}

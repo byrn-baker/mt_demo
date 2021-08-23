@@ -1,0 +1,24 @@
+{% if devices[0]["device_role"]["slug"] == 'leaf'%}
+    {% for spine in spine_devices %}
+        {% for iface in spine["interfaces"] %}
+            {% if 'Loopback0'  in iface["name"] %}
+                {% for ip in iface["ip_addresses"] %}
+    neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
+    neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ spine["local_asn"] }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+{% if devices[0]["device_role"]["slug"] == 'spine'%}
+    {% for leaf in leaf_devices %}
+        {% for iface in leaf["interfaces"] %}
+            {% if 'Loopback0'  in iface["name"] %}
+                {% for ip in iface["ip_addresses"] %}
+    neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
+    neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}

@@ -1,0 +1,4 @@
+- name: Configuration Assembly
+  template:
+    src: "{{ansible_network_os}}.j2"
+    dest: "configs/{{ inventory_hostname }}.conf"

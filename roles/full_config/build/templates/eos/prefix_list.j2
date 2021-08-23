@@ -1,0 +1,7 @@
+{% set count = namespace(value=0) %}
+{% if devices[0]["config_context"]["prefix_list"] is defined %}
+    {% for prefix in devices[0]["config_context"]["prefix_list"] %}
+    {% set count.value = count.value + 5 %}
+ip prefix-list LOOPBACK seq {{ count.value }} permit {{ prefix }} 
+    {% endfor %}
+{% endif %}

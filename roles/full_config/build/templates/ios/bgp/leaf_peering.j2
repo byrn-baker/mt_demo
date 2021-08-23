@@ -1,0 +1,17 @@
+{% set leaf_devices = nb_leafs[0]["data"]["devices"] %}
+{% for interface in devices[0]["interfaces"] %}
+    {% if interface["role"] == 'leaf' %}
+        {% for peer in interface["connected_interface"]["ip_addresses"] %}
+ neighbor {{ peer["address"] | ipaddr('address') }} peer-group LEAF_SWITCH
+            {% for leaf in leaf_devices %}
+                {% for iface in leaf["interfaces"] %}
+                    {% for ip in iface["ip_addresses"] %}
+                        {% if ip["address"] == peer["address"] %}
+ neighbor {{ peer["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}

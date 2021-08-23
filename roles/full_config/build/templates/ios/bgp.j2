@@ -1,0 +1,17 @@
+
+router bgp {{ devices[0]["local_asn"] }}
+ bgp log-neighbor-changes
+{% for interface in devices[0]["interfaces"] %}
+  {% if 'Loop' in interface["name"] %}
+    {% for addr in interface.ip_addresses %}
+      {% if addr.address is defined %}
+      {% set rid = addr.address | ipaddr('address') %}
+ bgp router-id {{ rid }}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+ {% include './ios/bgp/edge_peer_group.j2' %}
+ {% include './ios/bgp/leaf_peer_group.j2' %}
+ {% include './ios/bgp/edge_peering.j2' %}
+ {% include './ios/bgp/leaf_peering.j2' %}

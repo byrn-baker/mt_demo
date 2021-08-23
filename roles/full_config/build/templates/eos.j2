@@ -1,0 +1,8 @@
+#jinja2: lstrip_blocks: "True", trim_blocks: "True"
+{% set devices = nb_devices[0]["data"]["devices"] %}
+{% set vrfs = nb_vrfs[0]["data"]["vrfs"] %}
+{% if devices[0]["device_type"]["slug"] == "leaf_veos" %}
+{% include "./eos/platform_templates/leaf_veos.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "spine_veos" %}
+{% include "./eos/platform_templates/spine_veos.j2"%}
+{% endif %}

@@ -1,0 +1,28 @@
+{% if interface["label"] == "trunk" and interface["enabled"] == true and 'ae' in interface["name"] %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description {{ interface["description"] }};
+    {% elif interface["connected_interface"] != None %}
+        description {{ interface["description"] }};
+    {% endif %}
+    {% if interface["untagged_vlan"]["vid"] is defined %}
+        native-vlan-id {{ interface["untagged_vlan"]["vid"] }};
+    {% endif %}
+        aggregated-ether-options {
+            minimum-links 1;
+            lacp {
+                active;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                interface-mode trunk;              
+    {% if interface["tagged_vlans"][0]["vid"] is defined %}
+                vlan {
+                    members [{{ interface["tagged_vlans"] | join(' ', attribute='vid')}}];
+    {% endif %}
+                }
+            }
+        }
+    }
+{% endif %}

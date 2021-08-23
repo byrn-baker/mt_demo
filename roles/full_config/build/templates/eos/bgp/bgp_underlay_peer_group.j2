@@ -1,0 +1,16 @@
+
+{% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    neighbor BGP_UNDERLAY peer group
+    {% if 'pod1' in leaf_devices[0]["name"] %}
+    neighbor BGP_UNDERLAY remote-as {{ spine_devices[0]["local_asn"] }}
+    {% endif %}
+    neighbor BGP_UNDERLAY send-community extended
+    neighbor BGP_UNDERLAY maximum-routes 12000
+{% elif devices[0]["device_role"]["slug"] == 'spine' %}
+    neighbor BGP_UNDERLAY peer group
+    {% if 'pod1' in leaf_devices[0]["name"] %}
+    neighbor BGP_UNDERLAY remote-as {{ leaf_devices[0]["local_asn"] }}
+    {% endif %}
+    neighbor BGP_UNDERLAY send-community extended
+    neighbor BGP_UNDERLAY maximum-routes 12000
+{% endif %}

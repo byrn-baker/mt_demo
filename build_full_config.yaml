@@ -1,0 +1,13 @@
+---
+- name: Query Nautobot for Device data and build full configuration
+  hosts: pod2_leaf3
+  gather_facts: false
+  connection: network_cli
+  become: true
+  
+  vars:
+    device: "{{inventory_hostname}}"
+  roles:
+  - { role: nautobot_query }
+  - { role: full_config/build }
+  # - { role: full_config/push }

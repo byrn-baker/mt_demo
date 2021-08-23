@@ -1,0 +1,46 @@
+{% set spine_devices = nb_spines[0]["data"]["devices"] %}
+{% set leaf_devices = nb_leafs[0]["data"]["devices"]%}
+{% if devices[0]["local_asn"] != '' or devices[0]["local_asn"] != None %}
+router bgp {{ devices[0]["local_asn"] }}
+    {% for interface in devices[0]["interfaces"] %}
+        {% if 'Loopback0' in interface["name"] %}
+            {% for addr in interface["ip_addresses"] %}
+    router-id {{ addr["address"] | ipaddr('address') }}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    no bgp default ipv4-unicast
+    distance bgp 20 200 200
+    maximum-paths 4 ecmp 64
+    {% include './eos/bgp/evpn_peer_group.j2' %}
+    {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    {% include './eos/bgp/leaf_peer_group.j2' %}
+    {% include './eos/bgp/edge_peer_group.j2' %}
+    {% endif %}
+    {% include './eos/bgp/bgp_underlay_peer_group.j2' %}
+    
+    {% include './eos/bgp/bgp_underlay_peering.j2'%}
+    {% include './eos/bgp/evpn_peering.j2'%}
+    {% include './eos/bgp/leaf_peering.j2'%}
+    {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    {% include './eos/bgp/edge_peering.j2'%}
+    {% endif %}
+    redistribute connected route-map LOOPBACK
+   !
+    {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    {% include './eos/bgp/vxlan_vlan_config.j2'%}
+    {% endif %}
+    address-family evpn
+        neighbor EVPN-OVERLAY-PEERS activate
+    !
+    address-family ipv4
+    {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+        neighbor LEAF_Peer activate
+        neighbor EDGE_ROUTER activate
+    {% endif %}
+      neighbor BGP_UNDERLAY activate
+    !
+    {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    {% include './eos/bgp/vrf_config.j2'%}
+    {% endif %}
+{% endif %}

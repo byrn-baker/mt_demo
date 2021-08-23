@@ -1,0 +1,15 @@
+{% if interface["label"] == "trunk" and 'Port-Channel' in interface["name"] %}
+ interface {{ interface["name"] }}
+    {% if interface["description"] != '' %}
+ description {{ interface.description }}
+    {% endif %}
+    {% if interface["untagged_vlan"]["vid"] is defined %}
+ switchport trunk native vlan {{ interface.untagged_vlan.vid }}
+    {% endif %}
+    {% if interface["tagged_vlans"][0]["vid"] is defined %}
+ switch trunk allowed vlan {{ interface["tagged_vlans"] | join(',', attribute='vid') }}
+    {% endif %}
+ switchport trunk encapsulation dot1q
+ switchport mode trunk 
+ !
+{% endif %}

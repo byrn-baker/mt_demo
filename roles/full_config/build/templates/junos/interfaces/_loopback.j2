@@ -1,0 +1,14 @@
+    {{ interface["name"] }} {
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+        {{ addr["description"] }} {
+            description "loopback";
+            family inet {
+                address {{ addr["address"]}};
+            }
+        }
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    }

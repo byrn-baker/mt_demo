@@ -1,0 +1,40 @@
+---
+all:
+  children:
+    pod1:
+      hosts:
+        pod1_router01:
+          ansible_host: 192.168.4.9
+          ansible_network_os: ios
+          ansible_ssh_common_args: -oKexAlgorithms=+diffie-hellman-group1-sha1
+        pod1_spine1:
+          ansible_host: 192.168.4.1
+          ansible_network_os: eos
+        pod1_leaf1:
+          ansible_host: 192.168.4.2
+          ansible_network_os: eos
+        pod1_leaf2:
+          ansible_host: 192.168.4.3
+          ansible_network_os: eos
+        pod1_access_switch01:
+          ansible_host: 192.168.4.4
+          ansible_network_os: ios
+          ansible_ssh_common_args: -oKexAlgorithms=+diffie-hellman-group1-sha1  
+    pod2:
+      hosts:
+        pod2_spine2:
+          ansible_host: 192.168.4.5
+          ansible_network_os: junos
+        pod2_router02:
+          ansible_host: 192.168.4.10
+          ansible_network_os: junos
+        pod2_leaf3:
+          ansible_host: 192.168.4.6
+          ansible_network_os: junos
+        pod2_leaf4:
+          ansible_host: 192.168.4.7
+          ansible_network_os: junos
+        pod2_access_switch02:
+          ansible_host: 192.168.4.8
+          ansible_network_os: ios
+          ansible_ssh_common_args: -oKexAlgorithms=+diffie-hellman-group1-sha1

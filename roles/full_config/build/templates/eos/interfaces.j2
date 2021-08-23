@@ -1,0 +1,13 @@
+{% for interface in devices[0]["interfaces"] %}
+{% if 'Port-Channel' in interface["name"] %}
+{% include "./eos/interfaces/_portchannel.j2" %}
+{% elif 'Loop' in interface["name"] %}
+{% include "./eos/interfaces/_loopback.j2" %}
+{% elif 'Vlan' in interface["name"] %}
+{% include "./eos/interfaces/_vlan.j2" %}
+{% elif devices[0]["device_type"]["slug"] == "leaf_veos" %}
+{% include "./eos/interfaces/_leaf_veos_physical.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "spine_veos" %}
+{% include "./eos/interfaces/_spine_veos_physical.j2" %}
+{% endif %}
+{% endfor %}

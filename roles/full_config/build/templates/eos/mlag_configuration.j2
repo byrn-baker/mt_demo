@@ -1,0 +1,18 @@
+{% for interface in devices[0]["interfaces"]%}
+    {% if 'Vlan4094' in interface["name"] %}
+mlag configuration
+    domain-id MLAG
+    local-interface {{ interface["name"] }}
+        {% if 'leaf1' in devices[0]["name"] %}
+    peer-address 192.168.255.2
+        {% elif 'leaf2' in devices[0]["name"] %}
+    peer-address 192.168.255.1
+        {% endif %}
+    {% endif %}
+{% endfor %}
+{% for interface in devices[0]["interfaces"]%}
+    {% if 'Port-Channel' in interface["name"] and interface["label"] == 'mlag' %}
+    peer-link {{ interface["name"] }}
+    {% endif %}
+{% endfor %}
+!

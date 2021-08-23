@@ -1,0 +1,7 @@
+#jinja2: lstrip_blocks: "True", trim_blocks: "True"
+{% set devices = nb_devices[0]["data"]["devices"] %}
+{% if devices[0]["device_type"]["slug"] == "access_ios" %}
+{% include "./ios/platform_templates/access_ios.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "router_ios" %}
+{% include "./ios/platform_templates/router_ios.j2"%}
+{% endif %}

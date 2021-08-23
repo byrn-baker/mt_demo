@@ -1,0 +1,34 @@
+{% set tenant = devices[0]["site"]["tenant"]["slug"] %}
+service routing protocols model multi-agent
+!
+hostname {{ devices[0]["name"] }}
+{% include './eos/dns.j2' %}
+
+!
+{% if device[0]["config_context"]["ntp"] is defined %}
+{% for ntp_server in device[0]["config_context"]["ntp"] %}
+ntp server {{ ntp_server }} iburst source Management0
+{% endfor %}
+{% endif %}
+{% if devices[0]["config_context"]["aaa-new-model"] is defined %}
+{% include './eos/aaa.j2' %}
+{% else %}
+no aaa root
+{% endif %}
+!
+{% include './eos/local_user.j2' %}
+
+!
+{% include './eos/vrf.j2'%}
+{% include './eos/interfaces.j2' %}
+!
+{% include './eos/ip_routing.j2' %}
+{% include './eos/prefix_list.j2' %}
+!
+{% include './eos/route_maps.j2' %}
+{% include './eos/bgp.j2' %}
+
+management api http-commands
+   no shutdown
+!
+end

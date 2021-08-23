@@ -1,0 +1,18 @@
+{% for vrf in vrfs %}
+    {% if vrf["tenant"] != None %}
+        {% if tenant in vrf["tenant"]["slug"] %}
+    vrf {{ vrf["name"] }}
+            {% for iface in devices[0]["interfaces"] %}
+                {% if 'Loopback0' in iface["name"] %}
+                    {% for ip in iface["ip_addresses"] %}
+        rd {{ ip["address"] | ipaddr('address') }}:{{ vrf["rd"] }}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        route-target import evpn {{ vrf["import_targets"][0]["name"] }}
+        route-target export evpn {{ vrf["export_targets"][0]["name"] }}
+        redistribute connected
+    !    
+        {% endif %}
+    {% endif %}
+{% endfor %}

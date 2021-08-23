@@ -1,0 +1,19 @@
+
+interfaces {
+{% for interface in devices[0]["interfaces"] %}
+{% if 'ae' in interface["name"] %}
+{% include "./junos/interfaces/_portchannel.j2" %}
+{% elif 'lo' in interface["name"] %}
+{% include "./junos/interfaces/_loopback.j2" %}
+{% elif 'irb' in interface["name"] %}
+{% include "./junos/interfaces/_vlan.j2" %}
+{% elif devices[0]["device_type"]["slug"] == "leaf_junos" %}
+{% include "./junos/interfaces/_leaf_junos_physical.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "spine_junos" %}
+{% include "./junos/interfaces/_spine_junos_physical.j2" %}
+{% elif devices[0]["device_type"]["slug"] == "router_junos" %}
+{% include "./junos/interfaces/_router_junos_physical.j2" %}#}
+{% endif %}
+{% endfor %}
+
+}

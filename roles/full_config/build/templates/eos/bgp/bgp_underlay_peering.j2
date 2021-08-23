@@ -1,0 +1,11 @@
+{% for interface in devices[0]["interfaces"] %}
+    {% if interface["role"] == 'spine' %}
+        {% for peer in interface["connected_interface"]["ip_addresses"] %}
+    neighbor {{ peer["address"] | ipaddr('address') }} peer group BGP_UNDERLAY
+        {% endfor %}
+    {% elif interface["role"] == 'leaf' %}
+        {% for peer in interface["connected_interface"]["ip_addresses"] %}
+    neighbor {{ peer["address"] | ipaddr('address') }} peer group BGP_UNDERLAY
+        {% endfor %}
+    {% endif %}
+{% endfor %}

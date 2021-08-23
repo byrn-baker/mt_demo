@@ -1,0 +1,7 @@
+{% for interface in devices[0]["interfaces"] %}
+    {% if interface["role"] == 'edge_router' %}
+        {% for peer in interface["connected_interface"]["ip_addresses"] %}
+    neighbor {{ peer["address"] | ipaddr('address') }} peer group EDGE_ROUTER
+        {% endfor %}
+    {% endif %}
+{% endfor %}

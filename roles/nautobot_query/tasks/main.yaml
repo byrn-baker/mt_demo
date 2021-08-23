@@ -1,0 +1,35 @@
+- name: Get device data from Nautobot
+  set_fact:
+    nb_devices: "{{ query('networktocode.nautobot.lookup_graphql', query_string, graph_variables=graph_variables, url=nb_url, token=nb_token) }}"
+
+- name: Get vrf data from Nautobot
+  set_fact:
+    nb_vrfs: "{{ query('networktocode.nautobot.lookup_graphql', query_vrf, url=nb_url, token=nb_token) }}"
+
+- name: Get all Spine devices data from Nautobot
+  set_fact:
+    nb_spines: "{{ query('networktocode.nautobot.lookup_graphql', query_spine, graph_variables=spine_var, url=nb_url, token=nb_token) }}"
+
+- name: Get all Spine devices data from Nautobot
+  set_fact:
+    nb_leafs: "{{ query('networktocode.nautobot.lookup_graphql', query_leaf, graph_variables=leaf_var, url=nb_url, token=nb_token) }}"
+
+# - name: Create directory if none exist
+#   file:
+#     path: querys
+#     state: directory
+
+# - name: Print device json to file
+#   copy:
+#     content: "{{ nb_devices | to_json }}"
+#     dest: "querys/{{ inventory_hostname }}.json"
+
+# - name: Print vrf json to file
+#   copy:
+#     content: "{{ nb_vrfs | to_json }}"
+#     dest: "querys/nb_vrfs.json"
+
+# - name: Print spine json to file
+#   copy:
+#     content: "{{ nb_spines | to_json }}"
+#     dest: "querys/spine_devices.json"

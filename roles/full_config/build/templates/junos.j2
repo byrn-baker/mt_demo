@@ -1,0 +1,9 @@
+#jinja2: lstrip_blocks: "True", trim_blocks: "True"
+{% set devices = nb_devices[0]["data"]["devices"] %}
+{% if devices[0]["device_type"]["slug"] == "leaf_junos" %}
+{% include "./junos/platform_templates/leaf_junos.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "spine_junos" %}
+{% include "./junos/platform_templates/spine_junos.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "router_junos" %}
+{% include "./junos/platform_templates/router_junos.j2"%}
+{% endif %}
