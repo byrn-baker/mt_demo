@@ -1,0 +1,16 @@
+    irb {
+        {{ interface["name"] | replace('irb.', 'unit ')}} {
+        {% if interface["ip_addresses"] | length > 0 %}
+            {% for addr in interface["ip_addresses"] %}
+                {% if addr["address"] is defined %}
+            family inet {
+                address {{ addr["address"] }}{% if interface["virtual_router"] != None or interface["virtual_router"] != ''%} {
+                    virtual-gateway-address {{ interface["virtual_router"] }};
+                }
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+            }
+        }
+    }

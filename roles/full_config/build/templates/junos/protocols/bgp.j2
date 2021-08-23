@@ -1,0 +1,31 @@
+    {% if devices[0]["local_asn"] != None or devices[0]["local_asn"] != '' %}
+    bgp {
+        group EVPN_FABRIC {
+            type internal;
+            {% for iface in devices[0]["interfaces"] %}
+                {% if iface == 'lo0' %}
+                    {% for ip in iface["ip_addresses"] %}
+                        {% if ip["description"] == 'unit 0' %}
+            local-address {{ ip["address"] }};
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            family evpn {
+                signaling;
+            }
+            multipath;
+            cluster 0.0.0.1;
+            {% if devices[0]["device_role"]["slug"] == 'leaf'%}
+                {% for spine in spine_devices %}
+                    {% for iface in spine["interfaces"] %}
+                        {% if 'lo0' in iface["name"] %}
+                            {% for ip in iface["ip_addresses"] %}
+                                {% if ip["description"] == 'unit 0' %}
+            neighbor {{ ip["address"] | ipaddr ('address') }}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% emdfor %}
+                {% endfor %}
+            {% endif %}
