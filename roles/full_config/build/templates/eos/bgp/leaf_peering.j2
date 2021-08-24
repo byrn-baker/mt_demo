@@ -1,5 +1,5 @@
-{% if devices[0]["device_role"]["slug"] == 'leaf' and devices[0]["name"] == 'leaf1' %}
+{% if devices[0]["device_role"]["slug"] == 'leaf' and 'leaf1' in devices[0]["name"] %}
     neighbor 192.168.255.2 peer group LEAF_Peer
-{% elif devices[0]["device_role"]["slug"] == 'leaf' and devices[0]["name"] == 'leaf2' %}
+{% elif devices[0]["device_role"]["slug"] == 'leaf' and 'leaf2' in devices[0]["name"] %}
     neighbor 192.168.255.1 peer group LEAF_Peer
 {% endif %}

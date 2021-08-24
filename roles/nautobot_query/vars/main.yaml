@@ -36,6 +36,7 @@ query_string: |
                 role: cf_role
                 virtual_router: cf_virtual_router_ipv4
                 vlan_vni: cf_vxlan_vlan_vni
+                int_vrf: cf_int_vrf
                 label
                 description
                 enabled
@@ -53,7 +54,7 @@ query_string: |
                 }
                 ip_addresses {
                     address
-                    description
+                    interface_unit: cf_int_unit
                     vrf {
                     name
                     rd
@@ -116,6 +117,7 @@ query_spine: |
             }
             ip_addresses {
                 address
+                interface_unit: cf_int_unit
                 vrf {
                 name
                 rd
@@ -161,6 +163,7 @@ query_leaf: |
             }
             ip_addresses {
                 address
+                interface_unit: cf_int_unit
                 vrf {
                 name
                 rd

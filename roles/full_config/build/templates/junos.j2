@@ -1,5 +1,8 @@
 #jinja2: lstrip_blocks: "True", trim_blocks: "True"
 {% set devices = nb_devices[0]["data"]["devices"] %}
+{% set vrfs = nb_vrfs[0]["data"]["vrfs"] %}
+{% set spine_devices = nb_spines[0]["data"]["devices"] %}
+{% set leaf_devices = nb_leafs[0]["data"]["devices"] %}
 {% if devices[0]["device_type"]["slug"] == "leaf_junos" %}
 {% include "./junos/platform_templates/leaf_junos.j2"%}
 {% elif devices[0]["device_type"]["slug"] == "spine_junos" %}

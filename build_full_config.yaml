@@ -10,4 +10,4 @@
   roles:
   - { role: nautobot_query }
   - { role: full_config/build }
-  # - { role: full_config/push }
+  - { role: full_config/push }

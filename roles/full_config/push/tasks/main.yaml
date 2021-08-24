@@ -12,3 +12,23 @@
     replace: line
     save_when: modified
   when: "ansible_network_os == 'eos'"
+
+### ---------------------------------------------------------------------------
+### CHECK THE CONFIGURATION TO MAKE SURE IT IS VALID ON JUNOS
+### ---------------------------------------------------------------------------
+- name: "### VALIDATE CANDIDATE CONFIGURATION ON REMOTE DEVICE ###"
+  juniper_junos_config:
+    load: override
+    src: "configs/{{ inventory_hostname }}.conf"
+    timeout: 240
+    diff: false
+    check: true
+    commit: false
+  register: junos_result
+  when: "ansible_network_os == 'junos'"
+
+- name: "### PRINT THE RESULT TO CONSOLE ###"
+  debug:
+    var: junos_result
+  when: "ansible_network_os == 'junos'"
+

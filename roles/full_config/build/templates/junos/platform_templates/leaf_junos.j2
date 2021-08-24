@@ -1,10 +1,6 @@
+version 18.4R1.8;
 system {
-    host-name {{ devices[0]["name"] }};
-    management-instance;;
-    root-authentication {
-        encrypted-password "$6$9Lt8Eru3$fjcxjCqq.rq0lqV35VDb4f86a07uWeqK1r0Axt0e8talYeMRFqLlm4rTEa4rx/bS1qgjUaOXovgUL5I0EliJl/";
-    }
-    login {
+    {# login {
         user automate {
             uid 2000;
             class super-user;
@@ -13,6 +9,9 @@ system {
             }
         }
     }
+    root-authentication {
+        encrypted-password "$6$9Lt8Eru3$fjcxjCqq.rq0lqV35VDb4f86a07uWeqK1r0Axt0e8talYeMRFqLlm4rTEa4rx/bS1qgjUaOXovgUL5I0EliJl/";
+    } #}
     services {
         ssh {
             root-login allow;
@@ -27,6 +26,8 @@ system {
             enable-explorer;
         }
     }
+    host-name {{ devices[0]["name"] }};
+    management-instance;
     syslog {
         user * {
             any emergency;
@@ -38,10 +39,15 @@ system {
         file interactive-commands {
             interactive-commands any;
         }
-        file default-log-messages {
-            any info;
-            match "(requested 'commit' operation)|(requested 'commit synchronize' operation)|(copying configuration to juniper.save)|(commit complete)|ifAdminStatus|(FRU power)|(FRU removal)|(FRU insertion)|(link UP)|transitioned|Transferred|transfer-file|(license add)|(license delete)|(package -X update)|(package -X delete)|(FRU Online)|(FRU Offline)|(plugged in)|(unplugged)|GRES";
-            structured-data;
+    }
+    extensions {
+        providers {
+            juniper {
+                license-type juniper deployment-scope commercial;
+            }
+            chef {
+                license-type juniper deployment-scope commercial;
+            }                           
         }
     }
 }
@@ -65,7 +71,7 @@ router-options {
     {% for iface in devices[0]["interfaces"] %}
         {% if iface["name"] == 'lo0' %}
             {% for addr in iface["ip_addresses"] %}
-                {% if addr["description"] == "unit 0" %}
+                {% if addr["interface_unit"] == "unit 0" %}
     router-id {{ addr["address"] | ipaddr('address') }};
                 {% endif %}
             {% endfor %}
@@ -77,13 +83,6 @@ router-options {
         ecmp-fast-reroute;
     }
 }
-routing-instances {
-    mgmt_junos {
-        description inband_mgmt;
-        routing-options {
-            static {
-                route 0.0.0.0/0 next-hop {{ devices[0]["config_context"]["routes"]["mgmt_gateway"] }};
-            }
-        }
-    }
-}
+{% include './junos/protocols.j2'%}
+
+{% include './junos/routing_instances.j2'%}

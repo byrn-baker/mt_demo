@@ -1,0 +1,93 @@
+routing-instances {
+    mgmt_junos {
+        description inband_mgmt;
+        routing-options {
+            static {
+                route 0.0.0.0/0 next-hop {{ devices[0]["config_context"]["routes"]["mgmt_gateway"] }};
+            }
+        }
+    }
+{% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    VIRTUAL_SWITCH {
+        description "VRF for virtual-switch";
+        protocols {
+            evpn {
+                encapsulation vxlan;
+                extended-vni-list all;
+                default-gateway no-gateway-community;
+            }
+        }
+        vlans {
+        {% for vlan in devices[0]["site"]["vlans"]%}
+            {% if vlan["vlan_vni"] != None %}
+            {{ vlan["name"] }} {
+                vlan-id {{ vlan["vid"] }};
+                l3-interface irb.{{ vlan["vid"] }};
+                vxlan {
+                    vni {{ vlan["vlan_vni"] }};
+                    ingress-node-replication;
+                }
+            }
+            {% endif %}
+        {% endfor %}
+        }
+        vtep-source-interface lo0.1;
+        instance-type virtual-switch;
+        {% for iface in devices[0]["interfaces"] -%} 
+            {% if iface['name'] == 'lo0' -%} 
+                {% for ip in iface["ip_addresses"] %}
+                    {% if ip["interface_unit"] == "unit 0"%}
+        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:{% for vlan in devices[0]["site"]["vlans"] -%}{% if vlan["vlan_vni"] != None -%}{{ vlan["vlan_vni"] }}{% endif %}{% endfor -%};
+                    {% endif %}
+                {% endfor -%} 
+            {% endif %}
+        {% endfor %}
+        vrf-target {
+        {% for vrf in vrfs %}
+            {% if vrf["tenant"] != None and vrf["tenant"]["slug"] == devices[0]["site"]["tenant"]["slug"] %}
+                {% for target in vrf["import_targets"] %}
+            target:{{ target["name"] }};
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+            auto;
+        }
+    {% endif %}
+    }
+    {% for vrf in vrfs %}
+        {% if vrf["tenant"] != None and vrf["tenant"]["slug"] == devices[0]["site"]["tenant"]["slug"] %}
+            {% for target in vrf["import_targets"] %}
+    {{ vrf["name"]}} {
+        instance-type vrf;
+        {% for iface in devices[0]["interfaces"] %}
+            {% if iface["int_vrf"] == vrf["name"] %}
+        interface {{ iface["name"]}};
+            {% endif %}
+        {% endfor %}
+        {% for iface in devices[0]["interfaces"] -%} 
+            {% if iface['name'] == 'lo0' -%} 
+                {% for ip in iface["ip_addresses"] %}
+                     {% if ip["interface_unit"] == "unit 0"%}
+        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:{% for vlan in devices[0]["site"]["vlans"] -%}{% if vlan["vlan_vni"] != None -%}{{ vlan["vlan_vni"] }}{% endif %}{% endfor -%};
+                    {% endif %}
+                {% endfor -%} 
+            {% endif %}
+        {% endfor %}
+        vrf-target target:{{ target["name"] }};
+        routing-options {
+            {% for iface in devices[0]["interfaces"] -%} 
+            {% if iface['name'] == 'lo0' -%} 
+                {% for ip in iface["ip_addresses"] %}
+                     {% if ip["interface_unit"] == "unit 1"%}
+            router-id {{ ip["address"] | ipaddr ('address') }};
+                    {% endif %}
+                {% endfor -%} 
+            {% endif %}
+        {% endfor %}
+            autonomous-system {{ devices[0]["local_asn"] }};
+        }
+    }
+            {% endfor %}
+        {% endif %}
+    {% endfor %}    
+}

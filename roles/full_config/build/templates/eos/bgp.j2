@@ -14,14 +14,14 @@ router bgp {{ devices[0]["local_asn"] }}
     maximum-paths 4 ecmp 64
     {% include './eos/bgp/evpn_peer_group.j2' %}
     {% if devices[0]["device_role"]["slug"] == 'leaf' %}
-    {% include './eos/bgp/leaf_peer_group.j2' %}
+    {# {% include './eos/bgp/leaf_peer_group.j2' %} #}
     {% include './eos/bgp/edge_peer_group.j2' %}
     {% endif %}
     {% include './eos/bgp/bgp_underlay_peer_group.j2' %}
     
     {% include './eos/bgp/bgp_underlay_peering.j2'%}
     {% include './eos/bgp/evpn_peering.j2'%}
-    {% include './eos/bgp/leaf_peering.j2'%}
+    {# {% include './eos/bgp/leaf_peering.j2'%} #}
     {% if devices[0]["device_role"]["slug"] == 'leaf' %}
     {% include './eos/bgp/edge_peering.j2'%}
     {% endif %}

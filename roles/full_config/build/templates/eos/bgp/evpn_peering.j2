@@ -1,10 +1,22 @@
 {% if devices[0]["device_role"]["slug"] == 'leaf'%}
     {% for spine in spine_devices %}
         {% for iface in spine["interfaces"] %}
-            {% if 'Loopback0'  in iface["name"] %}
+            {% if 'Loopback0'  in iface["name"]  or 'lo0.0' in iface["name"] %}
                 {% for ip in iface["ip_addresses"] %}
     neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
     neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ spine["local_asn"] }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    {% for leaf in leaf_devices %}
+        {% for iface in leaf["interfaces"] %}
+            {% if 'Loopback0'  in iface["name"] or 'lo0.0' in iface["name"] %}
+                {% for ip in iface["ip_addresses"] %}
+                    {% if devices[0]["name"] != leaf["name"] %}
+    neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
+    neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         {% endfor %}
@@ -13,7 +25,7 @@
 {% if devices[0]["device_role"]["slug"] == 'spine'%}
     {% for leaf in leaf_devices %}
         {% for iface in leaf["interfaces"] %}
-            {% if 'Loopback0'  in iface["name"] %}
+            {% if 'Loopback0'  in iface["name"] or 'lo0.0' in iface["name"] %}
                 {% for ip in iface["ip_addresses"] %}
     neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
     neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
