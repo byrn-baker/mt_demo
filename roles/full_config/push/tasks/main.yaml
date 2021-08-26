@@ -32,3 +32,14 @@
     var: junos_result
   when: "ansible_network_os == 'junos'"
 
+### -------------------------------------------------
+### APPLY CONFIGURATION
+### -------------------------------------------------
+- name: "### APPLY CANDIDATE CONFIGURATION ON REMOTE DEVICE ###"
+  juniper_junos_config:
+    load: override
+    src: "configs/{{ inventory_hostname }}.conf"
+    timeout: 240
+  register: result
+  when: "ansible_network_os == 'junos' and junos_result.failed == false"
+

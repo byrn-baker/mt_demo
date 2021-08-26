@@ -2,6 +2,7 @@
     {% if interface["role"] == 'edge_router' %}
         {% for peer in interface["connected_interface"]["ip_addresses"] %}
     neighbor {{ peer["address"] | ipaddr('address') }} peer group EDGE_ROUTER
+    neighbor {{ peer["address"] | ipaddr('address') }} description EDGE_ROUTER
         {% endfor %}
     {% endif %}
 {% endfor %}

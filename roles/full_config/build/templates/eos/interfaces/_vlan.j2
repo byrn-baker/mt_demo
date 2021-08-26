@@ -3,10 +3,18 @@ interface {{ interface["name"] }}
     {% if interface["description"] != '' %}
  description {{ interface["description"] }}
     {% endif %}
+    {% if interface["int_vrf"] == 'none' %}
+    {% elif interface["int_vrf"] != None %}
+ vrf {{ interface["int_vrf"] }}
+    {% endif %}
     {% if interface["ip_addresses"] | length > 0 %}
         {% for addr in interface["ip_addresses"] %}
             {% if addr["address"] is defined %}
  ip address {{ addr["address"] }}
+            {% endif %}
+            {% if interface["virtual_router"] == "none" %}
+            {% elif interface["virtual_router"] != None %}
+ ip virtual-router address {{ interface["virtual_router"] }}
             {% endif %}
         {% endfor %}
     {% endif %}

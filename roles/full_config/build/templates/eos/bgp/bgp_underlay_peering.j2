@@ -1,11 +1,24 @@
+
 {% for interface in devices[0]["interfaces"] %}
     {% if interface["role"] == 'spine' %}
         {% for peer in interface["connected_interface"]["ip_addresses"] %}
     neighbor {{ peer["address"] | ipaddr('address') }} peer group BGP_UNDERLAY
+    neighbor {{ peer["address"] | ipaddr('address') }} description {{ interface["connected_interface"]["device"]["name"] }}
+            {% for spine in spine_devices %}
+                {% if interface["connected_interface"]["device"]["name"] == spine["name"]%}
+    neighbor {{ peer["address"] | ipaddr('address') }} remote-as {{ spine["local_asn"] }}
+                {% endif %}
+            {% endfor %}
         {% endfor %}
     {% elif interface["role"] == 'leaf' %}
         {% for peer in interface["connected_interface"]["ip_addresses"] %}
     neighbor {{ peer["address"] | ipaddr('address') }} peer group BGP_UNDERLAY
+    neighbor {{ peer["address"] | ipaddr('address') }} description {{ interface["connected_interface"]["device"]["name"] }}
+            {% for leaf in leaf_devices %}
+                {% if interface["connected_interface"]["device"]["name"] == leaf["name"]%}
+    neighbor {{ peer["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
+                {% endif %}
+            {% endfor %}
         {% endfor %}
     {% endif %}
 {% endfor %}

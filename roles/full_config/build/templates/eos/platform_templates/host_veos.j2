@@ -24,24 +24,10 @@ no aaa root
 
 !
 {% include './eos/vlans.j2'%}
-{% include './eos/vrf.j2'%}
 {% include './eos/interfaces.j2' %}
-{% include './eos/vxlan.j2' %}
 
-{% if devices[0]["viritual_router_mac"] != None %}
-ip virtual-router mac-address {{ devices[0]["viritual_router_mac"] }}
-!
-{% endif %}
 {% include './eos/ip_routing.j2' %}
 !
-{% include './eos/prefix_list.j2' %}
-!
-{% include './eos/mlag_configuration.j2' %}
-
-{% include './eos/route_maps.j2' %}
-
-{% include './eos/bgp.j2' %}
-
 management api http-commands
    no shutdown
 !

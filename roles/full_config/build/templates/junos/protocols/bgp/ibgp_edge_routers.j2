@@ -1,0 +1,28 @@
+        
+        group IBGP_EDGE_ROUTERS {
+            type internal;
+            peer-as 65000;
+            import EDGE_BGP_POLICY;
+            family inet {
+                unicast;
+            }
+            export EDGE_BGP_POLICY;
+            {# {% for iface in devices[0]["interfaces"] %}
+                {% if iface["name"] == 'lo0' %}
+                    {% for ip in iface["ip_addresses"] %}
+                        {% if ip["interface_unit"] == 'unit 0'%}
+            local-address {{ ip["address"] | ipaddr ('address') }}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %} #}
+            {% for interface in devices[0]["interfaces"] %}
+                {% if interface["role"] == 'edge_router' %}
+                    {% for peer in interface["connected_interface"]["ip_addresses"] %}
+            neighbor {{ peer["address"] | ipaddr('address') }} {
+                description {{ interface["connected_interface"]["device"]["name"] }};
+            }
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        }

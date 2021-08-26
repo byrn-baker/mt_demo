@@ -1,5 +1,5 @@
 {% if devices[0]["device_role"]["slug"] == 'leaf'%}
-    {% for spine in spine_devices %}
+    {# {% for spine in spine_devices %}
         {% for iface in spine["interfaces"] %}
             {% if 'Loopback0'  in iface["name"]  or 'lo0.0' in iface["name"] %}
                 {% for ip in iface["ip_addresses"] %}
@@ -8,21 +8,33 @@
                 {% endfor %}
             {% endif %}
         {% endfor %}
-    {% endfor %}
+    {% endfor %} #}
     {% for leaf in leaf_devices %}
         {% for iface in leaf["interfaces"] %}
-            {% if 'Loopback0'  in iface["name"] or 'lo0.0' in iface["name"] %}
+            {% if 'Loopback0'  in iface["name"] %}
                 {% for ip in iface["ip_addresses"] %}
                     {% if devices[0]["name"] != leaf["name"] %}
     neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
     neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
+    neighbor {{ ip["address"] | ipaddr('address') }} description {{ leaf["name"] }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if 'lo0' in iface["name"] %}
+                {% for ip in iface["ip_addresses"] %}
+                    {% if devices[0]["name"] != leaf["name"] %}
+                        {% if ip["interface_unit"] == 'unit 0'%}
+    neighbor {{ ip["address"] | ipaddr('address') }} peer group EVPN-OVERLAY-PEERS
+    neighbor {{ ip["address"] | ipaddr('address') }} remote-as {{ leaf["local_asn"] }}
+    neighbor {{ ip["address"] | ipaddr('address') }} description {{ leaf["name"] }}
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             {% endif %}
         {% endfor %}
     {% endfor %}
 {% endif %}
-{% if devices[0]["device_role"]["slug"] == 'spine'%}
+{# {% if devices[0]["device_role"]["slug"] == 'spine'%}
     {% for leaf in leaf_devices %}
         {% for iface in leaf["interfaces"] %}
             {% if 'Loopback0'  in iface["name"] or 'lo0.0' in iface["name"] %}
@@ -33,4 +45,4 @@
             {% endif %}
         {% endfor %}
     {% endfor %}
-{% endif %}
+{% endif %} #}

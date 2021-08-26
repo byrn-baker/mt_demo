@@ -1,0 +1,50 @@
+{% if interface["label"] == "Layer3" and interface["enabled"] == true and 'ge' in interface["name"] %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description "{{ interface["description"] }}";
+    {% elif interface["connected_interface"] != None %}
+        description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}";
+    {% endif %}
+        unit 0 {
+            family inet {
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+                address {{ addr["address"]}};
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+            }
+        }
+    }
+{% elif interface["lag"] != None %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description "{{ interface["description"] }}";
+    {% endif %}
+        ether-options {
+            802.3ad {{ interface["lag"]["name"] }};
+        }
+{% elif interface["label"] == "mgmt" %}
+    {{ interface["name"] }} {
+        description "MGMT";
+        unit 0 {
+            family inet {
+        {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+                address {{ addr["address"]}};
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+            }
+        }
+    }
+    em1 {
+        unit 0 {
+            family inet {
+                address 169.254.0.2/24;
+            }                           
+        }
+    }
+{% endif %}

@@ -5,4 +5,6 @@
 {% include "./eos/platform_templates/leaf_veos.j2"%}
 {% elif devices[0]["device_type"]["slug"] == "spine_veos" %}
 {% include "./eos/platform_templates/spine_veos.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "host_veos" %}
+{% include "./eos/platform_templates/host_veos.j2"%}
 {% endif %}

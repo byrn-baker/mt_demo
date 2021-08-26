@@ -10,7 +10,7 @@ system {
         }
     }
     root-authentication {
-        encrypted-password "$6$9Lt8Eru3$fjcxjCqq.rq0lqV35VDb4f86a07uWeqK1r0Axt0e8talYeMRFqLlm4rTEa4rx/bS1qgjUaOXovgUL5I0EliJl/";
+        encrypted-password "$6$nU9mv.ib$9ngqeArutZJsI9b9O0/.uRYE0Xjxci8oyhTQr1/jRfJqzFX46imSmmRp1byW8ZjieQvcoQrVidltll3p9F7y1.";
     }
     services {
         ssh {
@@ -60,13 +60,8 @@ chassis {
 }
 {% include './junos/interfaces.j2' %}
 
-policy-options {
-    policy-statement ecmp_policy {
-        term 10 {
-            then accept;
-        }
-    }
-}
+{% include './junos/policy_options.j2'%}
+
 routing-options {
     {% for iface in devices[0]["interfaces"] %}
         {% if iface["name"] == 'lo0' %}
@@ -86,3 +81,13 @@ routing-options {
 {% include './junos/protocols.j2'%}
 
 {% include './junos/routing_instances.j2'%}
+
+{% if devices[0]["site"]["vlans"] is defined %}
+vlans {
+    {% for vlan in devices[0]["site"]["vlans"] %}
+    {{ vlan["name"] }} {
+        vlan-id {{ vlan["vid"]}};
+    }
+    {% endfor %}
+}
+{% endif %}

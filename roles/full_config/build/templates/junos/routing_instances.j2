@@ -31,13 +31,13 @@ routing-instances {
             {% endif %}
         {% endfor %}
         }
-        vtep-source-interface lo0.1;
+        vtep-source-interface lo0.0;
         instance-type virtual-switch;
         {% for iface in devices[0]["interfaces"] -%} 
             {% if iface['name'] == 'lo0' -%} 
                 {% for ip in iface["ip_addresses"] %}
                     {% if ip["interface_unit"] == "unit 0"%}
-        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:{% for vlan in devices[0]["site"]["vlans"] -%}{% if vlan["vlan_vni"] != None -%}{{ vlan["vlan_vni"] }}{% endif %}{% endfor -%};
+        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:{{ devices[0]["local_asn"]}};
                     {% endif %}
                 {% endfor -%} 
             {% endif %}
@@ -52,8 +52,8 @@ routing-instances {
         {% endfor %}
             auto;
         }
-    {% endif %}
     }
+
     {% for vrf in vrfs %}
         {% if vrf["tenant"] != None and vrf["tenant"]["slug"] == devices[0]["site"]["tenant"]["slug"] %}
             {% for target in vrf["import_targets"] %}
@@ -61,7 +61,9 @@ routing-instances {
         instance-type vrf;
         {% for iface in devices[0]["interfaces"] %}
             {% if iface["int_vrf"] == vrf["name"] %}
-        interface {{ iface["name"]}};
+                {% for ip in iface["ip_addresses"] %}
+        interface {{ iface["name"] }}.{{ip["interface_unit"] | replace('unit ', '') }};
+                {% endfor %}
             {% endif %}
         {% endfor %}
         {% for iface in devices[0]["interfaces"] -%} 
@@ -78,7 +80,7 @@ routing-instances {
             {% for iface in devices[0]["interfaces"] -%} 
             {% if iface['name'] == 'lo0' -%} 
                 {% for ip in iface["ip_addresses"] %}
-                     {% if ip["interface_unit"] == "unit 1"%}
+                     {% if ip["interface_unit"] == "unit 0"%}
             router-id {{ ip["address"] | ipaddr ('address') }};
                     {% endif %}
                 {% endfor -%} 
@@ -89,5 +91,6 @@ routing-instances {
     }
             {% endfor %}
         {% endif %}
-    {% endfor %}    
+    {% endfor %}
+{% endif %}
 }

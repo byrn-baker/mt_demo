@@ -1,17 +1,16 @@
-{% if interface["label"] == "access" and interface["enabled"] == true and 'GigabitEthernet' in interface["name"] %}
+{% if interface["label"] == "access" and interface["enabled"] == true and 'Ethernet' in interface["name"] %}
 interface {{ interface["name"] }}
     {% if interface["description"] != '' %}
  description {{ interface["description"] }}
     {% elif interface["connected_interface"] != None %}
- description {{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}   
+ description {{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}
     {% endif %}
  switchport mode access
  switchport access vlan {{ interface["untagged_vlan"]["vid"] }}
  spanning-tree portfast edge
- no cdp enable
- no shut 
+ no shut
  !
-{% elif interface["label"] == "trunk" and interface["enabled"] == true and 'GigabitEthernet' in interface["name"] %}
+{% elif interface["label"] == "trunk" and interface["enabled"] == true and 'Ethernet' in interface["name"] %}
 interface {{ interface["name"] }}
     {% if interface["description"] != '' %}
  description {{ interface["description"] }}
@@ -19,40 +18,53 @@ interface {{ interface["name"] }}
  description {{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}
     {% endif %}
     {% if interface["untagged_vlan"]["vid"] is defined %}
- switchport trunk native vlan {{ interface.untagged_vlan.vid }}
+ switchport trunk native vlan {{ interface["untagged_vlan"]["vid"] }}
     {% endif %}
     {% if interface["tagged_vlans"][0]["vid"] is defined %}
  switch trunk allowed vlan {{ interface["tagged_vlans"] | join(',', attribute='vid') }}
     {% endif %}
- switchport trunk encapsulation dot1q
  switchport mode trunk 
-    {% if interface['lag']["name"] is defined %}
- channel-group {{ interface['lag']["name"] | replace ('Port-Channel', '') }} mode on
+    {% if interface["lag"]["name"] is defined %}
+ channel-group {{ interface["lag"]["name"] | replace ('Port-Channel', '') }} mode active
     {% endif %}
- no shut  
+ no shut
+ !
+{% elif interface["label"] == "Layer3" and interface["enabled"] == true and 'Ethernet' in interface["name"] %}
+interface {{ interface["name"]["split"]('.')[0] }}
+    {% if interface["description"] != '' %}
+ description {{ interface["description"] }}
+    {% elif interface["connected_interface"] != None %}
+ description {{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}
+    {% endif %}
+ no switchport
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+ ip address {{ addr["address"] }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
  !
 {% elif interface["label"] == "mgmt" %}
 interface {{ interface["name"] }}
     {% if interface["description"] != '' %}
  description {{ interface["description"] }}    
     {% endif %}
- no switchport
- vrf forwarding MGMT
+ vrf MGMT
     {% if interface["ip_addresses"] | length > 0 %}
         {% for addr in interface["ip_addresses"] %}
             {% if addr["address"] is defined %}
- ip address {{ addr["address"] | ipaddr('address') }} {{ addr["address"] | ipaddr('netmask') }}
- negotiation auto
- no cdp enable
+ ip address {{ addr["address"] }}
  no shutdown
             {% endif %}
         {% endfor %}
     {% endif %}
- !   
+ !
 {% else %}
+{% if interface["enabled"] == False %}
 interface {{ interface["name"] }}
  description NOT IN USE
- negotiation auto
  shutdown
  !
+{% endif %}
 {% endif %}

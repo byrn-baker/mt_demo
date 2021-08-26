@@ -1,5 +1,8 @@
 protocols {
     {% include './junos/protocols/bgp.j2' %}
     {% include './junos/protocols/lldp.j2'%}
-    
+    {% if devices[0]["device_type"]["slug"] == 'leaf_junos' %}
+    {% include './junos/protocols/mstp.j2'%}
+    {% endif %}
+
 }

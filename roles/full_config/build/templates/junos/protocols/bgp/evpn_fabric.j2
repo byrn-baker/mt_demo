@@ -1,7 +1,7 @@
         group EVPN_FABRIC {
             type external;
             multihop {
-                ttl 3;
+                ttl 255;
             }
             {% for iface in devices[0]["interfaces"] %}
                 {% if iface['name'] == 'lo0' %}
@@ -40,6 +40,7 @@
                     {% endfor %}
                 {% endfor %}
                 {% for leaf in leaf_devices %}
+                    {% if leaf["name"] != devices[0]["name"]%}
                     {% for iface in leaf["interfaces"] %}
                         {% if iface["name"] == 'Loopback0' %}
                             {% for ip in iface["ip_addresses"] %}
@@ -62,6 +63,7 @@
                             {% endfor %}
                         {% endif %}
                     {% endfor %}
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             {% if devices[0]["device_role"]["slug"] == 'spine'%}

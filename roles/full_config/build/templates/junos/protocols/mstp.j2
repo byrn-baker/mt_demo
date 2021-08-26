@@ -1,0 +1,8 @@
+
+    mstp {
+    {% for iface in devices[0]["interfaces"] %}
+        {% if iface["label"] == "trunk" %}
+        interface {{ iface["name"] }};
+        {% endif %}
+    {% endfor %}
+    }

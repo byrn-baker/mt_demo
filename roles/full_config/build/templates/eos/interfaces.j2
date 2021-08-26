@@ -9,5 +9,7 @@
 {% include "./eos/interfaces/_leaf_veos_physical.j2"%}
 {% elif devices[0]["device_type"]["slug"] == "spine_veos" %}
 {% include "./eos/interfaces/_spine_veos_physical.j2" %}
+{% elif devices[0]["device_type"]["slug"] == "host_veos" %}
+{% include "./eos/interfaces/_host_veos_physical.j2" %}
 {% endif %}
 {% endfor %}
