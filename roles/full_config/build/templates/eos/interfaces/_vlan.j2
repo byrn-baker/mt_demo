@@ -4,7 +4,7 @@ interface {{ interface["name"] }}
  description {{ interface["description"] }}
     {% endif %}
     {% if interface["int_vrf"] == 'none' %}
-    {% elif interface["int_vrf"] != None %}
+    {% elif interface["int_vrf"] != None  and interface["name"] != 'Vlan4094'%}
  vrf {{ interface["int_vrf"] }}
     {% endif %}
     {% if interface["ip_addresses"] | length > 0 %}
@@ -13,7 +13,7 @@ interface {{ interface["name"] }}
  ip address {{ addr["address"] }}
             {% endif %}
             {% if interface["virtual_router"] == "none" %}
-            {% elif interface["virtual_router"] != None %}
+            {% elif interface["virtual_router"] != None and interface["name"] != 'Vlan4094' %}
  ip virtual-router address {{ interface["virtual_router"] }}
             {% endif %}
         {% endfor %}

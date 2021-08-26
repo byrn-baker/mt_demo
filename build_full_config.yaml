@@ -1,6 +1,6 @@
 ---
 - name: Query Nautobot for Device data and build full configuration
-  hosts: pod1_access_switch02
+  hosts: pod2_access_switch03
   gather_facts: false
   connection: network_cli
   become: true
@@ -10,4 +10,4 @@
   roles:
   - { role: nautobot_query }
   - { role: full_config/build }
-  - { role: full_config/push }
+  # - { role: full_config/push }

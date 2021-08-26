@@ -9,6 +9,9 @@ interface {{ interface["name"] }}
         {% if interface["tagged_vlans"][0]["vid"] is defined %}
  switch trunk allowed vlan {{ interface["tagged_vlans"] | join(',', attribute='vid') }}
         {% endif %}
+        {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+ mlag {{ interface["name"] | replace ('Port-Channel', '')}}
+        {% endif %}
  switchport mode trunk
  !
 {% elif interface["label"] == "Layer3" and interface["enabled"] == true and 'Port-Channel' in interface["name"] %}

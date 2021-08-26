@@ -12,6 +12,8 @@ interfaces {
 {% include "./junos/interfaces/_spine_junos_physical.j2" %}
 {% elif devices[0]["device_type"]["slug"] == "router_junos" %}
 {% include "./junos/interfaces/_router_junos_physical.j2" %}
+{% elif devices[0]["device_type"]["slug"] == "host_junos" %}
+{% include "./junos/interfaces/_host_junos_physical.j2" %}
 {% endif %}
 {% endfor %}
 

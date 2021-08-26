@@ -9,4 +9,6 @@
 {% include "./junos/platform_templates/spine_junos.j2"%}
 {% elif devices[0]["device_type"]["slug"] == "router_junos" %}
 {% include "./junos/platform_templates/router_junos.j2"%}
+{% elif devices[0]["device_type"]["slug"] == "host_junos" %}
+{% include "./junos/platform_templates/host_junos.j2"%}
 {% endif %}

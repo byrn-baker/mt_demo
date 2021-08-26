@@ -25,7 +25,7 @@ interface {{ interface["name"] }}
     {% endif %}
  switchport mode trunk 
     {% if interface["lag"]["name"] is defined %}
- channel-group {{ interface["lag"]["name"] | replace ('Port-Channel', '') }} mode activate
+ channel-group {{ interface["lag"]["name"] | replace ('Port-Channel', '') }} mode active
     {% endif %}
  no shut
  !
