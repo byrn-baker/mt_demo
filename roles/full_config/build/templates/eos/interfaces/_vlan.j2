@@ -12,10 +12,10 @@ interface {{ interface["name"] }}
             {% if addr["address"] is defined %}
  ip address {{ addr["address"] }}
             {% endif %}
-            {% if interface["virtual_router"] == "none" %}
+            {# {% if interface["virtual_router"] == "none" %}
             {% elif interface["virtual_router"] != None and interface["name"] != 'Vlan4094' %}
  ip virtual-router address {{ interface["virtual_router"] }}
-            {% endif %}
+            {% endif %} #}
         {% endfor %}
     {% endif %}
  !

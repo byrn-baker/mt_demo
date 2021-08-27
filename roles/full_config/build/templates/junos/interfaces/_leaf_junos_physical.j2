@@ -21,19 +21,25 @@
     {% elif interface["connected_interface"] != None %}
         description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}";
     {% endif %}
-    {% if interface["untagged_vlan"]["vid"] is defined %}
+    {% if interface["lag"]["name"] is defined %}
+        ether-options {
+            802.3ad {{ interface["lag"]["name"] }}
+        }
+    {% else %}    
+        {% if interface["untagged_vlan"]["vid"] is defined %}
         native-vlan-id {{ interface["untagged_vlan"]["vid"] }};
-    {% endif %}
+        {% endif %}
         unit 0 {
             family ethernet-switching {
                 interface-mode trunk;              
-    {% if interface["tagged_vlans"][0]["vid"] is defined %}
+        {% if interface["tagged_vlans"][0]["vid"] is defined %}
                 vlan {
-                    members [{{ interface["tagged_vlans"] | join(' ', attribute='vid')}}];
+                    members [{{ interface["tagged_vlans"] | join(' ', attribute='name')}}];
                 }
-    {% endif %}
+        {% endif %}
             }
         }
+    {% endif %}
     }
 {% elif interface["label"] == "Layer3" and interface["enabled"] == true and 'xe' in interface["name"] %}
     {{ interface["name"] }} {

@@ -1,16 +1,19 @@
     {{ interface["name"] }} {
+        {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+        apply-groups IRB_OPTIONS;
+        {% endif %}
         {% if interface["ip_addresses"] | length > 0 %}
             {% for addr in interface["ip_addresses"] %}
                 {% if addr["address"] is defined %}
         {{ addr["interface_unit"] }} {
             family inet {
-                    {# {% if interface["virtual_router"] != None or interface["virtual_router"] != '' %}
+                    {% if interface["virtual_router"]|length %}
                 address {{ addr["address"] }} {
                     virtual-gateway-address {{ interface["virtual_router"] }};
                 }
-                    {% else %} #}
+                    {% else %}
                 address {{ addr["address"] }};
-                    {# {% endif %} #}
+                    {% endif %}
                 {% endif %}
             {% endfor %}
         {% endif %}

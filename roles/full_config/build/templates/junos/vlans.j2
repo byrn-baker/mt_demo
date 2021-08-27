@@ -1,0 +1,22 @@
+{% if devices[0]["site"]["vlans"] is defined %}
+vlans {
+    {% for vlan in devices[0]["site"]["vlans"] %}
+    {{ vlan["name"] }} {
+        vlan-id {{ vlan["vid"]}};
+        {% if devices[0]["device_role"]["slug"] == 'host_switch' or devices[0]["device_role"]["slug"] == 'leaf' and vlan["vid"] != 4094 %}
+            {% for iface in devices[0]["interfaces"] %}
+                {% if 'irb' in iface["name"] %}
+        l3-interface irb.{{vlan["vid"] }};
+                {% endif  %}
+            {% endfor %}
+        {% endif %}
+        {% if devices[0]["device_role"]["slug"] == 'leaf' and vlan["vlan_vni"] != None %}
+        vxlan {
+            ingress-node-replication;
+            vni {{ vlan["vlan_vni"] }};
+        }
+        {% endif %}
+    }
+    {% endfor %}
+}
+{% endif %}

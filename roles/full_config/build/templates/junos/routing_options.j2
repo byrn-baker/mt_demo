@@ -1,0 +1,16 @@
+routing-options {
+    {% for iface in devices[0]["interfaces"] %}
+        {% if iface["name"] == 'lo0' %}
+            {% for addr in iface["ip_addresses"] %}
+                {% if addr["interface_unit"] == "unit 0" %}
+    router-id {{ addr["address"] | ipaddr('address') }};
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    autonomous-system {{ devices[0]["local_asn"] }};
+    forwarding-table {
+        export ecmp_policy;
+        ecmp-fast-reroute;
+    }
+}

@@ -1,0 +1,22 @@
+switch-options {
+    vtep-source-interface lo0.0;
+    {% for vrf in vrfs %}
+    {% if vrf["tenant"] != None and vrf["tenant"]["slug"] == devices[0]["site"]["tenant"]["slug"] %}
+        {% for iface in devices[0]["interfaces"] -%} 
+            {% if iface['name'] == 'lo0' -%} 
+                {% for ip in iface["ip_addresses"] %}
+                     {% if ip["interface_unit"] == "unit 0"%}
+        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:{{ vrf["rd"]}};
+                    {% endif %}
+                {% endfor -%} 
+            {% endif %}
+        {% endfor %}
+    vrf-target {
+            {% for target in vrf["import_targets"] %}
+        target:{{ target["name"] }};
+            {% endfor %}
+        auto;
+    }
+    {% endif %}
+    {% endfor %}
+}

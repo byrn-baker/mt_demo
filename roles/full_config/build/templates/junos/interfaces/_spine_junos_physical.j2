@@ -29,7 +29,7 @@
                 interface-mode trunk;              
     {% if interface["tagged_vlans"][0]["vid"] is defined %}
                 vlan {
-                    members [{{ interface["tagged_vlans"] | join(' ', attribute='vid')}}];
+                    members [{{ interface["tagged_vlans"] | join(' ', attribute='name')}}];
                 }
     {% endif %}
             }

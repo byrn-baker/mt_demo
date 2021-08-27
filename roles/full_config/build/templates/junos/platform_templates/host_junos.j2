@@ -1,4 +1,6 @@
 version 18.4R1.8;
+{% include './junos/groups.j2'%}
+
 system {
     login {
         user automate {
@@ -64,12 +66,4 @@ chassis {
 
 {% include './junos/routing_instances.j2'%}
 
-{% if devices[0]["site"]["vlans"] is defined %}
-vlans {
-    {% for vlan in devices[0]["site"]["vlans"] %}
-    {{ vlan["name"] }} {
-        vlan-id {{ vlan["vid"]}};
-    }
-    {% endfor %}
-}
-{% endif %}
+{% include './junos/vlans.j2'%}

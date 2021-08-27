@@ -27,6 +27,7 @@ interface {{ interface["name"] }}
     {% if interface["lag"]["name"] is defined %}
  channel-group {{ interface["lag"]["name"] | replace ('Port-Channel', '') }} mode active
     {% endif %}
+ mtu 9214
  no shut
  !
 {% elif interface["label"] == "Layer3" and interface["enabled"] == true and 'Ethernet' in interface["name"] %}

@@ -28,10 +28,10 @@ no aaa root
 {% include './eos/interfaces.j2' %}
 {% include './eos/vxlan.j2' %}
 
-{% if devices[0]["viritual_router_mac"] != None %}
+{# {% if devices[0]["viritual_router_mac"] != None %}
 ip virtual-router mac-address {{ devices[0]["viritual_router_mac"] }}
 !
-{% endif %}
+{% endif %} #}
 {% include './eos/ip_routing.j2' %}
 !
 {% include './eos/prefix_list.j2' %}
