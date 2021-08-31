@@ -8,10 +8,16 @@ policy-options {
     policy-statement BGP_UNDERLAY {
         term 10 {
             from {
-                protocol [ direct bgp ];
-        {% for prefix in devices[0]["config_context"]["prefix_list"] %}
+                protocol bgp;
+            {% for prefix in devices[0]["config_context"]["prefix_list"] %}
                 route-filter {{ prefix | replace ('eq 32', 'orlonger')}};
-        {% endfor %}
+            {% endfor %}
+            }
+            then accept;
+        }
+        term 20 {
+            from {
+                protocol direct;
             }
             then accept;
         }
@@ -28,5 +34,34 @@ policy-options {
             }
         }
     }
+    {% endif %}
+    {% if devices[0]["device_role"]["slug"] == 'leaf'%}
+    policy-statement LEAF-IN {
+        term import_leaf_esi {
+            from {
+                community comm-leaf_esi
+            }
+            then accept;
+        }
+        {% for vlan in devices[0]["site"]["vlans"] %}
+        term import_vni_{{vlan["vlan_vni"]}} {
+            from {
+                community {{vlan["name"]}}
+            }
+            then accept;
+        }
+        {% endfor %}
+    }
+    policy-statement loadbalance {
+        then {
+            load-balance per-packet;
+        }
+    }
+        {% for vrf in vrfs %}
+            {% if vrf["tenant"] != None and vrf["tenant"]["slug"] == devices[0]["site"]["tenant"]["slug"] %}
+    community {{ vrf["name"] }} members target:{{vrf["import_targets"][0]["name"]}};
+            {% endif %}
+        {% endfor %}
+    community comm-leaf_esi members target:9999:9999;
     {% endif %}
 }

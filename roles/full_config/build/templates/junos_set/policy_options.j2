@@ -1,0 +1,12 @@
+set policy-options policy-statement ecmp_policy term 10 then accept
+{% if devices[0]["config_context"]["prefix_list"] is defined %}
+set policy-options policy-statement BGP_UNDERLAY term 10 from protocol [ direct bgp ]
+    {% for prefix in devices[0]["config_context"]["prefix_list"] %}
+set policy-options policy-statement BGP_UNDERLAY term 10 from route-filter {{ prefix | replace ('eq 32', 'orlonger')}}
+    {% endfor %}
+set policy-options policy-statement BGP_UNDERLAY term 10 then accept
+{% endif %}
+{% if devices[0]["device_role"]["slug"] == 'router'%}
+set policy-options policy-statement EDGE_BGP_POLICY term 10 then accept
+set policy-options policy-statement EDGE_BGP_POLICY term next-hop-self then next-hop self
+{% endif %}

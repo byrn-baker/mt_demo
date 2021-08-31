@@ -3,20 +3,21 @@ interface {{ interface["name"] }}
     {% if interface["description"] != '' %}
  description {{ interface["description"] }}
     {% endif %}
-    {% if interface["int_vrf"] == 'none' %}
-    {% elif interface["int_vrf"] != None  and interface["name"] != 'Vlan4094'%}
- vrf {{ interface["int_vrf"] }}
-    {% endif %}
-    {% if interface["ip_addresses"] | length > 0 %}
-        {% for addr in interface["ip_addresses"] %}
-            {% if addr["address"] is defined %}
+    {% if interface["name"] != 'Vlan4094'%}
+        {% if interface["ip_addresses"] | length > 0 %}
+            {% for addr in interface["ip_addresses"] %}
+                {% if addr["address"] is defined %}
+                    {% if addr["vrf"] is defined %}
+ vrf {{ addr["vrf"]["name"] }}
+                    {% endif %}
  ip address {{ addr["address"] }}
-            {% endif %}
+                {% endif %}
             {# {% if interface["virtual_router"] == "none" %}
             {% elif interface["virtual_router"] != None and interface["name"] != 'Vlan4094' %}
  ip virtual-router address {{ interface["virtual_router"] }}
             {% endif %} #}
-        {% endfor %}
-    {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endif %} 
  !
 {% endif %}

@@ -1,0 +1,49 @@
+{% if interface["label"] == "access" and interface["enabled"] == true and 'xe' in interface["name"] %}
+    {% if interface["description"] != '' %}
+set interfaces {{ interface["name"] }} description "{{ interface["description"] }}"
+    {% elif interface["connected_interface"] != None %}
+set interfaces {{ interface["name"] }} description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}"
+    {% endif %}
+set interfaces {{ interface["name"] }} unit 0 family ethernet-switching interface-mode access
+set interfaces {{ interface["name"] }} unit 0 family ethernet-switching vlan members {{ interface["untagged_vlan"]["name"] }}
+{% elif interface["label"] == "trunk" and interface["enabled"] == true and 'xe' in interface["name"] %}
+{% if interface["description"] != '' %}
+set interfaces {{ interface["name"] }} description "{{ interface["description"] }}"
+    {% elif interface["connected_interface"] != None %}
+set interfaces {{ interface["name"] }} description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}"
+    {% endif %}
+    {% if interface["lag"]["name"] is defined %}
+set interfaces {{ interface["name"] }} ether-options 802.3ad {{ interface["lag"]["name"] }}
+    {% else %}    
+        {% if interface["untagged_vlan"]["vid"] is defined %}
+set interfaces {{ interface["name"] }} native-vlan-id {{ interface["untagged_vlan"]["vid"] }}
+        {% endif %}
+set interfaces {{ interface["name"] }} unit 0 family ethernet-switching interface-mode trunk
+        {% if interface["tagged_vlans"][0]["vid"] is defined %}
+set interfaces {{ interface["name"] }} unit 0 family ethernet-switching vlan members [{{ interface["tagged_vlans"] | join(' ', attribute='vid')}}]
+        {% endif %}
+    {% endif %}
+{% elif interface["label"] == "Layer3" and interface["enabled"] == true and 'xe' in interface["name"] %}
+    {% if interface["description"] != '' %}
+set interfaces {{ interface["name"] }} description "{{ interface["description"] }}"
+    {% elif interface["connected_interface"] != None %}
+set interfaces {{ interface["name"] }} description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}"
+    {% endif %}
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+set interfaces {{ interface["name"] }} unit 0 family inet address {{ addr["address"]}}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% elif interface["label"] == "mgmt" %}
+set interfaces {{ interface["name"] }} description "MGMT"
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+set interfaces {{ interface["name"] }} unit 0 family inet address {{ addr["address"]}}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+set interfaces em1 unit 0 family inet address 169.254.0.2/24
+{% endif %}

@@ -1,0 +1,11 @@
+{% if devices[0]["device_role"]["slug"] == 'leaf' or devices[0]["device_role"]["slug"] == 'spine' or devices[0]["device_role"]["slug"] == 'router' %}
+{% include './junos/protocols/bgp.j2' %}
+{% endif %}
+{# {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+{% include './junos/protocols/evpn.j2' %}
+{% endif %} #}
+{% include './junos/protocols/lldp.j2'%}
+
+{% if devices[0]["device_type"]["slug"] == 'leaf_junos' or devices[0]["device_type"]["slug"] == 'host_junos' %}
+{% include './junos/protocols/mstp.j2'%}
+{% endif %}

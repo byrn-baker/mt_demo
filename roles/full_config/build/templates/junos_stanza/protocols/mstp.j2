@@ -1,0 +1,10 @@
+
+    mstp {
+    {% for iface in devices[0]["interfaces"] %}
+        {% if iface["label"] == "trunk" and 'ae' in iface["name"] %}
+        interface {{ iface["name"] }};
+        {% elif iface["label"] == "trunk" and iface["lag"]["name"] is not defined and iface["enabled"] == true %}
+        interface {{ iface["name"] }};
+        {% endif %}
+    {% endfor %}
+    }

@@ -9,9 +9,10 @@
                 {% endfor %}
             {% endif %}
         {% endfor %}
-      route-target both {{ vlan["vxlan_rt"] }}
-      route-target import {{ vlan["vlan_vni"]}}:9999
-      route-target export {{ vlan["vlan_vni"]}}:9999
+      {# route-target both {{ vlan["vxlan_rt"] }} #}
+      route-target import 1:{{ vlan["vlan_vni"]}}
+      route-target export 1:{{ vlan["vlan_vni"]}}
+      route-target import 9999:9999
       redistribute learned
       vlan {{ vlan["vid"] }}
    !

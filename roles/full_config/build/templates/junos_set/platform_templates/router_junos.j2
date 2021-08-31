@@ -1,0 +1,20 @@
+set system host-name {{ devices[0]["name"] }}
+set system root-authentication encrypted-password "$6$nU9mv.ib$9ngqeArutZJsI9b9O0/.uRYE0Xjxci8oyhTQr1/jRfJqzFX46imSmmRp1byW8ZjieQvcoQrVidltll3p9F7y1."
+set system login user automate uid 2000
+set system login user automate class super-user
+set system login user automate authentication encrypted-password "$6$iW5a5wge$Ybp80TVa2dAvMGne9SRr6.8jIr2kGGJ/Wk5p.S.J1sFXkw58l0g4kG4NaWqQbpqjwMurroIbpXXJsPmwRIJeU."
+set system services ssh root-login allow
+set system services netconf ssh
+set system services rest http port 8080
+set system services rest enable-explorer
+set system management-instance
+set system syslog user * any emergency
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+{% include './junos/interfaces.j2' %}
+{% include './junos/policy_options.j2'%}
+{% include './junos/routing_options.j2'%}
+
+{% include './junos/protocols.j2'%}
+{% include './junos/routing_instances.j2'%}

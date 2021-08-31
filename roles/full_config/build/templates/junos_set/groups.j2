@@ -1,0 +1,8 @@
+set groups IRB_OPTIONS interfaces irb unit <*> proxy-macip-advertisement
+set groups IRB_OPTIONS interfaces irb unit <*> virtual-gateway-accept-data
+set groups IRB_OPTIONS interfaces irb unit <*> family inet address <*> primary
+set groups IRB_OPTIONS interfaces irb unit <*> family inet address <*> preferred
+set groups IRB_OPTIONS interfaces irb unit <*> virtual-gateway-v4-mac 00:5e:5e:5e:00:01
+set groups AE_MTU_JUMBO interfaces <*> mtu 9192
+set groups AE_LACP_BOND interfaces <*> aggregated-ether-options lacp active
+set groups AE_LACP_BOND interfaces <*> aggregated-ether-options lacp periodic slow

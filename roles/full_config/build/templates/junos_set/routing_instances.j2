@@ -1,0 +1,47 @@
+set routing-instances mgmt_junos description inband_mgmt
+set routing-instances mgmt_junos routing-options static route 0.0.0.0/0 next-hop {{ devices[0]["config_context"]["routes"]["mgmt_gateway"] }}
+{% if devices[0]["device_role"]["slug"] == 'leaf' %}
+set routing-instances VIRTUAL_SWITCH description "VRF for virtual-switch"
+set routing-instances VIRTUAL_SWITCH protocols evpn encapsulation vxlan
+set routing-instances VIRTUAL_SWITCH protocols evpn extended-vni-list all
+set routing-instances VIRTUAL_SWITCH protocols evpn default-gateway no-gateway-community
+        {% for vlan in devices[0]["site"]["vlans"]%}
+            {% if vlan["vlan_vni"] != None %}
+set routing-instances VIRTUAL_SWITCH vlans {{ vlan["name"] }} vlan-id {{ vlan["vid"] }}
+set routing-instances VIRTUAL_SWITCH vlans {{ vlan["name"] }} l3-interface irb.{{ vlan["vid"] }}
+set routing-instances VIRTUAL_SWITCH vlans {{ vlan["name"] }} vxlan vni {{ vlan["vlan_vni"] }}
+set routing-instances VIRTUAL_SWITCH vlans {{ vlan["name"] }} vxlan ingress-node-replication
+            {% endif %}
+        {% endfor %}
+set routing-instances VIRTUAL_SWITCH vtep-source-interface lo0.0
+set routing-instances VIRTUAL_SWITCH instance-type virtual-switch
+        {% for iface in devices[0]["interfaces"] %}
+            {% if iface['name'] == 'lo0.0' %}
+                {% for ip in iface["ip_addresses"] %}
+set routing-instances VIRTUAL_SWITCH route-distinguisher {{ ip["address"] | ipaddr ('address') }}:1
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+set routing-instances VIRTUAL_SWITCH vrf-target target:65100:1111
+set routing-instances VIRTUAL_SWITCH vrf-target auto
+set routing-instances EVPN_VRF_1 instance-type vrf
+        {% for iface in devices[0]["interfaces"] %}
+            {% if 'irb' in iface["name"] or iface["name"] == 'lo0.1'%}
+set routing-instances EVPN_VRF_1 interface {{ iface["name"] }}
+            {% endif %}
+            {% if iface["name"] == 'lo0.1' %}
+                {% for ip in iface["ip_addresses"] %}
+set routing-instances EVPN_VRF_1 route-distinguisher {{ ip["address"] | ipaddr ('address') }}:1
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+set routing-instances EVPN_VRF_1 vrf-target target:64500:1
+        {% for iface in devices[0]["interfaces"] %}
+            {% if iface["name"] == 'lo0.1' %}
+                {% for ip in iface["ip_addresses"] %}
+set routing-instances EVPN_VRF_1 routing-options router-id {{ ip["address"] | ipaddr ('address') }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+set routing-instances EVPN_VRF_1 routing-options autonomous-system 64500
+{% endif %}

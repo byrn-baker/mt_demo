@@ -1,5 +1,8 @@
         group BGP_UNDERLAY {
             type external;
+            multipath {
+                multiple-as;
+            }
             import BGP_UNDERLAY;
             family inet {
                 unicast;

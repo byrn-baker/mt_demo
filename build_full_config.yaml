@@ -1,6 +1,6 @@
 ---
 - name: Query Nautobot for Device data and build full configuration
-  hosts: pod2_router02
+  hosts: pod1_access_switch02
   gather_facts: false
   connection: network_cli
   become: true

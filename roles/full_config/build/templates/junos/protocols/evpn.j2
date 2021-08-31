@@ -1,8 +1,7 @@
-{% for vlan in devices[0]["site"]["vlans"] %}
-    {% if vlan["vlan_vni"] != None %}
     evpn {
+    {% if devices[0]["site"]["vlans"] != None %}
         encapsulation vxlan;
-        extended-vni-list {{ vlan["vlan_vni"]}};
+        extended-vni-list [{{ devices[0]["site"]["vlans"] | join(' ', attribute='vlan_vni') }}];
+        multicast-mode ingress-replication;
         }
     {% endif %}
-{% endfor %}

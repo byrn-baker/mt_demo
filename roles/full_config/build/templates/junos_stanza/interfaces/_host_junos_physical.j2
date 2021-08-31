@@ -1,0 +1,93 @@
+{% if interface["label"] == "access" and interface["enabled"] == true and 'xe' in interface["name"] %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description "{{ interface["description"] }}";
+    {% elif interface["connected_interface"] != None %}
+        description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}";
+    {% endif %}
+        unit 0 {
+            family ethernet-switching {
+                 interface-mode access;
+                 vlan {
+                    members {{ interface["untagged_vlan"]["name"] }};
+                }
+            }
+        }
+    }
+{% elif interface["label"] == "trunk" and interface["enabled"] == true and 'xe' in interface["name"] %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description "{{ interface["description"] }}";
+    {% elif interface["connected_interface"] != None %}
+        description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}";
+    {% endif %}
+    {% if interface["lag"]["name"] is defined %}
+        ether-options {
+            802.3ad {{ interface["lag"]["name"] }}
+        }
+    {% else %}    
+        {% if interface["untagged_vlan"]["vid"] is defined %}
+        native-vlan-id {{ interface["untagged_vlan"]["vid"] }};
+        {% endif %}
+        unit 0 {
+            family ethernet-switching {
+                interface-mode trunk;              
+        {% if interface["tagged_vlans"][0]["vid"] is defined %}
+                vlan {
+                    members [{{ interface["tagged_vlans"] | join(' ', attribute='name')}}];
+                }
+        {% endif %}
+            }
+        }
+    {% endif %}
+    }
+{% elif interface["label"] == "Layer3" and interface["enabled"] == true and 'xe' in interface["name"] %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description "{{ interface["description"] }}";
+    {% elif interface["connected_interface"] != None %}
+        description "{{ interface["connected_interface"]["device"]["name"] }} :: {{interface["connected_interface"]["name"]}}";
+    {% endif %}
+        unit 0 {
+            family inet {
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+                address {{ addr["address"]}};
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+            }
+        }
+    }
+{% elif interface["lag"] != None %}
+    {{ interface["name"] }} {
+    {% if interface["description"] != '' %}
+        description "{{ interface["description"] }}";
+    {% endif %}
+        ether-options {
+            802.3ad {{ interface["lag"]["name"] }};
+        }
+{% elif interface["label"] == "mgmt" %}
+    {{ interface["name"] }} {
+        description "MGMT";
+        unit 0 {
+            family inet {
+        {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+                address {{ addr["address"]}};
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+            }
+        }
+    }
+    em1 {
+        unit 0 {
+            family inet {
+                address 169.254.0.2/24;
+            }                           
+        }
+    }
+{% endif %}

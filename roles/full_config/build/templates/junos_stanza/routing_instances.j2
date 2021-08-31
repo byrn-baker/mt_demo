@@ -1,0 +1,73 @@
+routing-instances {
+    mgmt_junos {
+        description inband_mgmt;
+        routing-options {
+            static {
+                route 0.0.0.0/0 next-hop {{ devices[0]["config_context"]["routes"]["mgmt_gateway"] }};
+            }
+        }
+    }
+{% if devices[0]["device_role"]["slug"] == 'leaf' %}
+    VIRTUAL_SWITCH {
+        description "VRF for virtual-switch";
+        protocols {
+            evpn {
+                encapsulation vxlan;
+                extended-vni-list all;
+                default-gateway no-gateway-community;
+            }
+        }
+        vlans {
+        {% for vlan in devices[0]["site"]["vlans"]%}
+            {% if vlan["vlan_vni"] != None %}
+            {{ vlan["name"] }} {
+                vlan-id {{ vlan["vid"] }};
+                l3-interface irb.{{ vlan["vid"] }};
+                vxlan {
+                    vni {{ vlan["vlan_vni"] }};
+                    ingress-node-replication;
+                }
+            }
+            {% endif %}
+        {% endfor %}
+        }
+        vtep-source-interface lo0.0;
+        instance-type virtual-switch;
+        {% for iface in devices[0]["interfaces"] %}
+            {% if iface['name'] == 'lo0.0' %}
+                {% for ip in iface["ip_addresses"] %}
+        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:1;
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        vrf-target {
+            target:65100:1111;
+            auto;
+        }
+    }
+    EVPN_VRF_1 {
+        instance-type vrf;
+        {% for iface in devices[0]["interfaces"] %}
+            {% if 'irb' in iface["name"] or iface["name"] == 'lo0.1'%}
+        interface {{ iface["name"] }};
+            {% endif %}
+            {% if iface["name"] == 'lo0.1' %}
+                {% for ip in iface["ip_addresses"] %}
+        route-distinguisher {{ ip["address"] | ipaddr ('address') }}:1;
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        vrf-target target:64500:1;
+        routing-options {
+        {% for iface in devices[0]["interfaces"] %}
+            {% if iface["name"] == 'lo0.1' %}
+                {% for ip in iface["ip_addresses"] %}
+            router-id {{ ip["address"] | ipaddr ('address') }};
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+            autonomous-system 64500;
+        }
+    }
+{% endif %}
+}

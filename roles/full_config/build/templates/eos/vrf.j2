@@ -1,9 +1,9 @@
 {% for vrf in vrfs %}
-   {% if 'MGMT' in vrf["name"] %}
+   {% if vrf["name"] == "MGMT" %}
 vrf instance {{ vrf["name"] }}
 !
    {% endif %}
-   {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+   {% if devices[0]["device_role"]["slug"] == 'leaf'%}
       {% if vrf["tenant"] != None %}
          {% if tenant in vrf["tenant"]["slug"] %}
 vrf instance {{ vrf["name"] }}

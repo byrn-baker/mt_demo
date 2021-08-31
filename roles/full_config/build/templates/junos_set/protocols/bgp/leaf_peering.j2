@@ -1,0 +1,9 @@
+        
+        group LEAF_SWITCHES {
+            type internal;
+            {% if devices[0]["device_role"]["slug"] == 'leaf' and 'leaf3' in devices[0]["name"] %}
+            neighbor 192.168.255.2;
+            {% elif devices[0]["device_role"]["slug"] == 'leaf' and 'leaf4' in devices[0]["name"] %}
+            neighbor 192.168.255.1;
+            {% endif %}
+        }

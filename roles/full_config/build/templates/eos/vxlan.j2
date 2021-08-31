@@ -1,6 +1,6 @@
+interface Vxlan1
 {% for vlan in devices[0]["site"]["vlans"]%}
    {% if vlan["vlan_vni"] != None %}
-interface Vxlan1
    vxlan source-interface Loopback1
    vxlan udp-port 4789
    vxlan vlan {{vlan["vid"]}} vni {{vlan["vlan_vni"]}}

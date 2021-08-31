@@ -5,11 +5,11 @@
         {% endif %}
         {% if devices[0]["device_role"]["slug"] == 'leaf' %}
         {% include './junos/protocols/bgp/evpn_fabric.j2'%}
+        {% include './junos/protocols/bgp/arista_evpn_fabric.j2'%}
         {% include './junos/protocols/bgp/edge_routers.j2'%}
         {% elif devices[0]["device_role"]["slug"] == 'router'%}
         {% include './junos/protocols/bgp/leaf_switches.j2'%}
         {% include './junos/protocols/bgp/ibgp_edge_routers.j2'%}
-        {% endif %}
-        
+        {% endif %}   
     }
     {% endif %}

@@ -1,0 +1,32 @@
+policy-options {
+    policy-statement ecmp_policy {
+        term 10 {
+            then accept;
+        }
+    }
+    {% if devices[0]["config_context"]["prefix_list"] is defined %}
+    policy-statement BGP_UNDERLAY {
+        term 10 {
+            from {
+                protocol [ direct bgp ];
+        {% for prefix in devices[0]["config_context"]["prefix_list"] %}
+                route-filter {{ prefix | replace ('eq 32', 'orlonger')}};
+        {% endfor %}
+            }
+            then accept;
+        }
+    }
+    {% endif %}
+    {% if devices[0]["device_role"]["slug"] == 'router'%}
+    policy-statement EDGE_BGP_POLICY {
+        term 10 {
+            then accept;
+        }
+        term next-hop-self {
+            then {
+                next-hop self;
+            }
+        }
+    }
+    {% endif %}
+}

@@ -1,0 +1,14 @@
+set interfaces irb apply-groups IRB_OPTIONS
+{% if devices[0]["device_role"]["slug"] == 'leaf' or devices[0]["device_role"]["slug"] == 'host_switch' %}
+    {% if interface["ip_addresses"] | length > 0 %}
+        {% for addr in interface["ip_addresses"] %}
+            {% if addr["address"] is defined %}
+                {% if interface["virtual_router"]|length %}
+set interfaces irb {{ interface["name"] | replace('irb.', 'unit ') }} family inet address {{ addr["address"] }} virtual-gateway-address {{ interface["virtual_router"] }}
+                {% else %}
+set interfaces irb {{ interface["name"] | replace('irb.', 'unit ') }} family inet address {{ addr["address"] }}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endif %}

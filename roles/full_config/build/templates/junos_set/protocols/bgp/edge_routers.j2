@@ -1,0 +1,10 @@
+set protocols bgp group EDGE_ROUTERS type external
+set protocols bgp group EDGE_ROUTERS peer-as 65000
+{% for interface in devices[0]["interfaces"] %}
+    {% if interface["role"] == 'edge_router' %}
+        {% for peer in interface["connected_interface"]["ip_addresses"] %}
+set protocols bgp group EDGE_ROUTERS neighbor {{ peer["address"] | ipaddr('address') }}
+set protocols bgp group EDGE_ROUTERS description {{ interface["connected_interface"]["device"]["name"] }}
+        {% endfor %}
+    {% endif %}
+{% endfor %}

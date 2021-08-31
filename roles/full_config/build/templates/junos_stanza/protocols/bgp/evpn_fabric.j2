@@ -1,0 +1,86 @@
+        group EVPN_FABRIC {
+            type external;
+            multihop {
+                ttl 255;
+            }
+            {% for iface in devices[0]["interfaces"] %}
+                {% if iface['name'] == 'lo0.0' %}
+                    {% for ip in iface["ip_addresses"] %}
+            local-address {{ ip["address"] | ipaddr ('address') }};
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            family evpn {
+                signaling;
+            }
+            multipath;
+            {% if devices[0]["device_role"]["slug"] == 'leaf'%}
+                {# {% for spine in spine_devices %}
+                    {% for iface in spine["interfaces"] %}
+                        {% if iface["name"] == 'Loopback0' %}
+                            {% for ip in iface["ip_addresses"] %}
+            neighbor {{ ip["address"] | ipaddr ('address') }} {
+                description "{{ spine["name"] }}";
+                peer-as {{ spine["local_asn"] }};
+            }
+                            {% endfor %}
+                        {% endif %}
+                        {% if iface["name"] == 'lo0.0' %}
+                            {% for ip in iface["ip_addresses"] %}
+            neighbor {{ ip["address"] | ipaddr ('address') }} {
+                description "{{ spine["name"] }}";
+                peer-as {{ spine["local_asn"] }};
+            }
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %} #}
+                {% for leaf in leaf_devices %}
+                    {% if leaf["name"] != devices[0]["name"]%}
+                    {% for iface in leaf["interfaces"] %}
+                        {% if iface["name"] == 'Loopback0' %}
+                            {% for ip in iface["ip_addresses"] %}
+                                {% if devices[0]["name"] != leaf["name"] %}
+            neighbor {{ ip["address"] | ipaddr ('address') }} {
+                description "{{ leaf["name"] }}";
+                peer-as {{ leaf["local_asn"] }};
+            }
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        {% if iface["name"] == 'lo0.0' %}
+                            {% for ip in iface["ip_addresses"] %}
+            neighbor {{ ip["address"] | ipaddr ('address') }} {
+                description "{{ leaf["name"] }}";
+                peer-as {{ leaf["local_asn"] }};
+            }
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {# {% if devices[0]["device_role"]["slug"] == 'spine'%}
+                {% for leaf in leaf_devices %}
+                    {% for iface in leaf["interfaces"] %}
+                        {% if iface["name"] == 'Loopback0' %}
+                            {% for ip in iface["ip_addresses"] %}
+            neighbor {{ ip["address"] | ipaddr ('address') }} {
+                description "{{ leaf["name"] }}";
+                peer-as {{ leaf["local_asn"] }};
+            }
+                            {% endfor %}
+                        {% endif %}
+                        {% if iface["name"] == 'lo0.0' %}
+                            {% for ip in iface["ip_addresses"] %}
+            neighbor {{ ip["address"] | ipaddr ('address') }} {
+                description "{{ leaf["name"] }}";
+                peer-as {{ leaf["local_asn"] }};
+            }
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+            vpn-apply-export; #}
+        }

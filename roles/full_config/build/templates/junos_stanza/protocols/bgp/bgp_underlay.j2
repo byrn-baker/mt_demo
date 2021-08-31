@@ -1,0 +1,43 @@
+        group BGP_UNDERLAY {
+            type external;
+            import BGP_UNDERLAY;
+            family inet {
+                unicast;
+            }
+            import BGP_UNDERLAY;
+        {% if devices[0]["device_role"]["slug"] == 'leaf' %}
+            {% for iface in devices[0]["interfaces"] %}
+                {% if iface["role"] == 'spine' %}
+                    {% for peer in iface["connected_interface"]["ip_addresses"] %}
+            neighbor {{ peer["address"] | ipaddr ('address') }} {
+                description "{{ iface["connected_interface"]["device"]["name"] }}";
+                        {% for spine in spine_devices %}
+                            {% if iface["connected_interface"]["device"]["name"] == spine["name"] %}
+                peer-as {{ spine["local_asn"] }};
+                            {% endif %}
+                        {% endfor %}
+            }
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            export BGP_UNDERLAY;
+        }
+        {% endif %}
+        {% if devices[0]["device_role"]["slug"] == 'spine' %}
+            {% for iface in devices[0]["interfaces"] %}
+                {% if iface["role"] == 'leaf' %}
+                    {% for peer in iface["connected_interface"]["ip_addresses"] %}
+            neighbor {{ peer["address"] | ipaddr ('address') }} {
+                description "{{ iface["connected_interface"]["device"]["name"] }}";
+                            {% for leaf in leaf_devices %}
+                                {% if iface["connected_interface"]["device"]["name"] == leaf["name"] %}
+                peer-as {{ leaf["local_asn"] }};
+                                {% endif %}
+                            {% endfor %}
+            }
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            export BGP_UNDERLAY;
+        }
+        {% endif %}
