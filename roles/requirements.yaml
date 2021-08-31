@@ -1,9 +1,9 @@
 ---
 - src: juniper.junos
   version: 2.4.3
-- name: cisco.ios
-  version: 2.2.0
-- name: arista.eos
-  version: 2.2.0
-- name: networktocode.nautobot
-  version: 2.0.1
+# - name: cisco.ios
+#   version: 2.2.0
+# - name: arista.eos
+#   version: 2.2.0
+# - name: networktocode.nautobot
+#   version: 2.0.1
