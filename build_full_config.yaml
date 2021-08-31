@@ -1,12 +1,12 @@
 ---
 - name: Query Nautobot for Device data and build full configuration
-  hosts: "{{ device }}"
+  hosts: "{{ host }}"
   gather_facts: false
   connection: network_cli
   become: true
   
   vars:
-    device: "{{inventory_hostname}}"
+    device: "{{host}}"
   roles:
   - { role: nautobot_query }
   - { role: full_config/build }
